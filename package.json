@@ -1,0 +1,27 @@
+{
+  "name": "@snek/benchmark",
+  "version": "1.0.0",
+  "description": "benchmark like a pro, wherever you go",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devsnek/benchmark.git"
+  },
+  "author": "snek <me@gus.host>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devsnek/benchmark/issues"
+  },
+  "homepage": "https://github.com/devsnek/benchmark#readme",
+  "scripts": {
+    "build:browser": "webpack",
+    "prepublishOnly": "npm run build:browser"
+  },
+  "devDependencies": {
+    "uglifyjs-webpack-plugin": "^1.1.4",
+    "webpack": "^3.10.0"
+  },
+  "browser": "browser.js",
+  "unpkg": "browser.js",
+  "jsdelivr": "browser.js"
+}

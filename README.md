@@ -28,7 +28,7 @@ Also available through [unpkg][unpkg-link] and [jsdelivr][jsdelivr-link].
 [stats-link]: https://nodei.co/npm/@snek/benchmark/
 [version-badge]: http://versionbadg.es/devsnek/benchmark.svg
 [download-badge]: https://img.shields.io/npm/dt/@snek/benchmark.svg?maxAge=3600
-[dep-badge]: https://david-dm.org/guscaplan/benchmark.svg
-[dep-link]: https://david-dm.org/guscaplan/benchmark
+[dep-badge]: https://david-dm.org/devsnek/benchmark.svg
+[dep-link]: https://david-dm.org/devsnek/benchmark
 [unpkg-link]: https://unpkg.com/
 [jsdelivr-link]: https://www.jsdelivr.com/

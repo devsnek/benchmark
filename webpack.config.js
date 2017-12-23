@@ -1,4 +1,5 @@
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: require.resolve('.'),
@@ -9,13 +10,9 @@ module.exports = {
   },
   plugins: [
     new UglifyJSPlugin(),
+    new webpack.IgnorePlugin(/^(util|perf_hooks|child_process)/),
   ],
   node: {
-    util: 'empty',
-  },
-  resolve: {
-    alias: {
-      perf_hooks: require.resolve('./src/mock_perf_hooks'),
-    },
+    process: false,
   },
 };

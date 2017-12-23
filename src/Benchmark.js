@@ -1,40 +1,28 @@
-const { performance } = require('perf_hooks');
 const { evaluate } = require('./statistics');
-const { divisors } = require('./reference');
-
-// 1% uncertainty with resolution of 5us
-const minTime = 2.5;
-const maxTime = 5.0;
-const minSamples = 5;
+const worker = require('./worker');
+const util = require('./util');
 
 class Benchmark {
-  constructor(name, fn) {
+  constructor(name, fn, { setup, teardown } = {}) {
     this.name = name;
-    // this.fn = fn;
-    this.fn = /^[^{]+\{([\s\S]*)\}\s*$/.exec(fn.toString().replace(/^\s+|\s+$/g, ''))[1];
+    this.source = util.stringify(fn);
+    this.setup = setup ? util.stringify(setup) : undefined;
+    this.teardown = teardown ? util.stringify(teardown) : undefined;
 
-    // this.sample = [];
-    this.cycles = 0;
-    this.count = 1;
-    this.stats = {
-      sample: [],
-    };
-    this.times = {
-      start: 0,
-      elapsed: 0,
-    };
-    this.running = false;
-    this.hz = 0;
+    this.stats = undefined;
+    this.sample = undefined;
+    this.cycles = undefined;
   }
 
-  run() {
-    if (this.running)
-      return;
-    this.running = true;
-    this.times.start = performance.now();
-    while (this.running)
-      cycle(this);
-    evaluate(this);
+  async run() {
+    const { sample, cycles } = await worker({
+      source: this.source,
+      setup: this.setup,
+      teardown: this.teardown,
+    });
+    this.sample = sample;
+    this.cycles = cycles;
+    this.stats = evaluate(this);
     return this;
   }
 
@@ -52,40 +40,5 @@ class Benchmark {
 try {
   Benchmark.prototype[require('util').inspect.custom] = Benchmark.prototype.inspect;
 } catch (err) {} // eslint-disable-line no-empty
-
-function cycle(bench) {
-  const clocked = clock(bench.fn, bench.count);
-  bench.cycles++;
-  let count = bench.count;
-
-  let divisor;
-  if (!clocked && (divisor = divisors[bench.cycles]) !== null)
-    bench.count = Math.floor(4e6 / divisor);
-
-  const period = clocked / count;
-  const size = bench.stats.sample.push(period);
-  bench.hz = 1 / period;
-
-  count += Math.ceil((minTime - clocked) / (clocked / count));
-
-  if (count === Infinity)
-    bench.running = false;
-
-  const n = performance.now();
-  const maxedOut = size >= minSamples && (bench.times.elapsed += n - bench.times.start) / 1e9 > maxTime;
-  if (maxedOut)
-    bench.running = false;
-}
-
-function clock(src, count) {
-  // eslint-disable-next-line no-new-func
-  const fn = new Function('now', `
-let i = ${count};
-const start = now();
-while (i--) { ${src} }
-const end = now();
-return end - start;`);
-  return fn(performance.now);
-}
 
 module.exports = Benchmark;

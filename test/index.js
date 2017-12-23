@@ -1,10 +1,12 @@
 const { Suite } = require('../src');
 
-const s = new Suite();
+const s = new Suite({
+  setup: () => { const S = 'Hello, World!'; },
+});
 
-s.add('RegEx#test', () => { /o/.test('Hello, World!'); });
-s.add('String#indexOf', () => { ~~'Hello, World'.indexOf('o'); });
-s.add('String#includes', () => { 'Hello, World!'.includes('o'); });
+s.add('RegEx#test', () => { /o/.test(S); });
+s.add('String#indexOf', () => { !!S.indexOf('o'); });
+s.add('String#includes', () => { S.includes('o'); });
 
 s.on('cycle', console.log);
 

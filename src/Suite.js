@@ -2,21 +2,26 @@ const EventEmitter = require('events');
 const Benchmark = require('./Benchmark');
 
 class Suite extends EventEmitter {
-  constructor() {
+  constructor({ setup, teardown } = {}) {
     super();
     this.benches = [];
+    this.setup = setup;
+    this.teardown = teardown;
   }
 
   add(name, fn) {
-    this.benches.push(new Benchmark(name, fn));
+    this.benches.push(new Benchmark(name, fn, {
+      setup: this.setup,
+      teardown: this.teardown,
+    }));
     return this;
   }
 
-  run() {
-    for (const bench of this.benches) {
-      bench.run();
-      this.emit('cycle', bench);
-    }
+  async run() {
+    await Promise.all(this.benches.map(async(b) => {
+      await b.run();
+      this.emit('cycle', b);
+    }));
     return this;
   }
 }

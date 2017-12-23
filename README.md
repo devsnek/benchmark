@@ -10,16 +10,22 @@
 ```javascript
 const Benchmark = require('@snek/benchmark');
 
-const s = new Benchmark.Suite();
+const s = new Benchmark.Suite({
+  setup: () => { const S = 'Hello, World!'; },
+});
 
-s.add('RegExp#test', () => { /o/.test('Hello, World!'); });
-s.add('String#indexOf', () => { !!'Hello, World'.indexOf('o'); });
-s.add('String#includes', () => { 'Hello, World!'.includes('o'); });
+s.add('RegExp#test', () => { /o/.test(S); });
+s.add('String#indexOf', () => { !!S.indexOf('o'); });
+s.add('String#includes', () => { S.includes('o'); });
 
 s.on('cycle', console.log);
 
 s.run();
 ```
+
+All tests are run in a child process or a worker, depending on the context.
+Because of this the inner body of a test is disconnected from the scope where it is defined;
+using the setup and teardown options is essential in these cases.
 
 Also available through [unpkg][unpkg-link] and [jsdelivr][jsdelivr-link].
 
